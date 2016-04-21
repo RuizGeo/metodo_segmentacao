@@ -10,6 +10,8 @@ import numpy as np
 from skimage import measure
 from sknn.mlp import Classifier, Convolution, Layer
 #arquivo ortoimagem
+#Testar essa modificacao
+a=np.array([1,2,3,4,5])
 file_img= '/media/lagan11/Sistema/LuisFernando/Pesquisas/OBIA_C50/Rasters/orto/orto.tif'
 #Ler ortoimagem
 gdal.AllRegister()
