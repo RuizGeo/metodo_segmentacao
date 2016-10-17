@@ -59,7 +59,7 @@ def load_dataset(file_amostras_classes,file_img):
         Y_train = np_utils.to_categorical(classes.reshape(len(amostras_prop),1), nb_classes)
             
         X_train = amostras_treinamento.astype('float32')
-        X_train /= 255
+        X_train /=255
              
         return X_train, Y_train
 def rolling2d(a,win_h,win_w,step_h,step_w):
@@ -77,23 +77,23 @@ def rolling2d(a,win_h,win_w,step_h,step_w):
 def make_network(img_channels, img_rows, img_cols):
    model = Sequential()
  
-   model.add(Convolution2D(35, 3, 3, border_mode='same',
-                           input_shape=(img_channels, img_rows, img_cols)))
+   model.add(Convolution2D(15, 3, 3, border_mode='same',input_shape=(img_channels, img_rows, img_cols)))
    model.add(Activation('relu'))
-   model.add(Convolution2D(32, 3, 3))
+   model.add(MaxPooling2D(pool_size=(2, 2), dim_ordering="th")) 
+   model.add(Convolution2D(15, 3, 3))
    model.add(Activation('relu'))
-   model.add(MaxPooling2D(pool_size=(2, 2))) 
+   model.add(MaxPooling2D(pool_size=(2, 2), dim_ordering="th")) 
    #model.add(Convolution2D(64, 3, 3, border_mode='same'))
    #model.add(Activation('relu'))
    #model.add(Convolution2D(64, 3, 3))
    #model.add(Activation('relu'))
    #model.add(MaxPooling2D(pool_size=(2, 2)))
-   model.add(Dropout(0.25))
+   #model.add(Dropout(0.25))
  
    model.add(Flatten())
    model.add(Dense(512))
    model.add(Activation('relu'))
-   model.add(Dropout(0.5))
+   #model.add(Dropout(0.5))
    model.add(Dense(nb_classes))
    model.add(Activation('softmax'))
  
@@ -101,11 +101,11 @@ def make_network(img_channels, img_rows, img_cols):
    
 def train_model(model, X_train, Y_train, X_test, Y_test,nb_epoch, batch_size):
  
-   sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+   sgd = SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
    model.compile(loss='categorical_crossentropy', optimizer=sgd)
  
    model.fit(X_train, Y_train, nb_epoch=nb_epoch, batch_size=batch_size,
-             validation_split=0.3, show_accuracy=True, verbose=1)
+             validation_split=0.35, show_accuracy=True, verbose=1)
  
    #print('Testing...')
    #return model.evaluate(X_test, Y_test,
@@ -114,17 +114,17 @@ def train_model(model, X_train, Y_train, X_test, Y_test,nb_epoch, batch_size):
 #dados
 #amostras em raster
 #file_amostras= '/media/ruiz/Documentos/Pesquisas/Metodo_Segmentacao/Rasters/amostras_quad_alvos.tif'
-file_amostras_img='/media/ruiz/Documentos/Pesquisas/RN_conv/Rasters/amostras.tif'
+file_amostras_img='/home/ruiz/Documentos/Pesquisas/RN_conv/Rasters/amostras_A.tif'
 #arquivo ortoimagem
-file_orto= '/media/ruiz/Documentos/Pesquisas/Kmeans_Segmentacao/orto_img/orto.tif'
-file_amostras_classes = '/media/ruiz/Documentos/Pesquisas/RN_conv/Rasters/amostras_inteiro.tif'
+file_orto= '/home/ruiz/Documentos/Pesquisas/Kmeans_Segmentacao/orto_img/orto.tif'
+file_amostras_classes = '/home/ruiz/Documentos/Pesquisas/RN_conv/Rasters/amostras_inteiro_A.tif'
 #carregar os dados
 X_train, Y_train = load_dataset(file_amostras_classes,file_amostras_img)
 X_test, Y_test = X_train, Y_train
 #criar modelo
 modelo=make_network(3,X_train.shape[2],X_train.shape[2])
 #treinar o modelo
-train_model(modelo,X_train, Y_train,X_test, Y_test,20,5)
+train_model(modelo,X_train, Y_train,X_test, Y_test,1000,10)
 #Verificar na imagem
 ##ler amostras como array
 ds_img_orto= gdal.Open(file_orto, gdal.GA_ReadOnly)
